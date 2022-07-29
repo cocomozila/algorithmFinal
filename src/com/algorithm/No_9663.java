@@ -17,16 +17,30 @@ public class No_9663 {
         node = new int[n];
         dfs(n, 0);
         System.out.println(count);
-
     }
 
     public static void dfs(int n, int depth) {
-
         if (depth == n) {
             count++;
             return;
         }
+        for (int i = 0; i < n; i++) {
+            node[depth] = i;
+            if (answer(depth)) {
+                dfs(n,depth+1);
+            }
+        }
+    }
 
-
+    public static boolean answer(int line) {
+        for (int i = 0; i < line; i++) {
+            if (node[line] == node[i]) {
+                return false;
+            }
+            if (Math.abs(line - i) == Math.abs(node[line] - node[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 }
