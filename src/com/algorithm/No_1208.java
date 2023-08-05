@@ -3,61 +3,89 @@ package com.algorithm;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.StringTokenizer;
 
 public class No_1208 {
+
+    static int N;
+    static int S;
+    static int[] arr;
+    static ArrayList<Integer> leftList = new ArrayList<>();
+    static ArrayList<Integer> rightList = new ArrayList<>();
+    static long result;
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st = new StringTokenizer(br.readLine());
 
-        int N = Integer.parseInt(st.nextToken());
-        int K = Integer.parseInt(st.nextToken());
+        N = Integer.parseInt(st.nextToken());
+        S = Integer.parseInt(st.nextToken());
+        arr = new int[N];
 
         st = new StringTokenizer(br.readLine());
-        int[] arr = new int[N];
-
         for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(st.nextToken());
         }
-        Arrays.sort(arr);
 
-        int left = 0;
-        int right = N-1;
-        int sum = 0;
-        int cnt = 0;
+        createList(0, 0, N/2, leftList);
+        createList(0, N/2, N, rightList);
 
-        while (left < right) {
-            int leftIdx = left;
-            int rightIdx = right;
+        Collections.sort(leftList);
+        Collections.sort(rightList);
 
-            sum += arr[leftIdx] + arr[rightIdx];
+        getResult();
+        if (S == 0) {
+            System.out.println(result - 1);
+        } else {
+            System.out.println(result);
+        }
+    }
 
-            while (leftIdx < rightIdx) {
-                if (sum > K) {
-                    sum += arr[--rightIdx];
-                }
-                else if (sum < K) {
-                    sum += arr[++leftIdx];
-                }
-                else {
-                    cnt++;
-                    sum = 0;
-                    break;
-                }
+    private static void getResult() {
+        int leftIndex = 0;
+        int rightIndex = rightList.size() - 1;
+
+        while (true) {
+            if (leftIndex == leftList.size() || rightIndex < 0) {
+                break;
             }
 
-            if (sum > K) {
-                right--;
-                sum = 0;
+            int leftValue = leftList.get(leftIndex);
+            int rightValue = rightList.get(rightIndex);
+            int sum = leftValue + rightValue;
+
+            if (sum < S) {
+                leftIndex += 1;
+
+            } else if (sum > S) {
+                rightIndex -= 1;
+
             } else {
-                left++;
-                sum = 0;
+                long leftCount = 0;
+                while (leftIndex < leftList.size() && leftList.get(leftIndex) == leftValue) {
+                    leftCount += 1;
+                    leftIndex += 1;
+                }
+                long rightCount = 0;
+                while (0 <= rightIndex && rightList.get(rightIndex) == rightValue) {
+                    rightCount += 1;
+                    rightIndex -= 1;
+                }
+                result += leftCount * rightCount;
+
             }
         }
-        System.out.println(cnt);
+    }
 
+    private static void createList(int sum, int start, int end, ArrayList<Integer> list) {
+        if (start == end) {
+            list.add(sum);
+            return;
+        }
+        createList(sum, start + 1, end, list);
+        createList(sum + arr[start], start + 1, end, list);
     }
 }
